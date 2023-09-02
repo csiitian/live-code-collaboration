@@ -1,56 +1,54 @@
 import axios from "axios";
 
-export const createRoom = (roomId, password) => {
-  return axios
-    .post("http://localhost:3000/create/", {
-      "room": roomId,
-      "password": password,
-      "isPriavte": true
-    })
-    .then(response => {
-      return response.data;
-    })
-    .catch(error => {
-      return null;
-    });
-}
+const API_BASE_URL = "http://localhost:3000";
 
-export const joinRoom = (roomId, password) => {
-  return axios
-    .post("http://localhost:3000/join/", {
-      "room": roomId,
-      "password": password,
-      "isPriavte": true
-    })
-    .then(response => {
-      return response.data;
-    })
-    .catch(error => {
-      return error;
+export const createRoom = async (roomId, password, isPrivate) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/create`, {
+      room: roomId,
+      password: password,
+      isPrivate: isPrivate,
     });
-}
+    return response.data;
+  } catch (error) {
+    console.error("Error creating room:", error);
+    return null;
+  }
+};
 
-export const createCode = (roomId, code) => {
-  return axios
-    .post("http://localhost:3000/code/", {
-      "room": roomId,
-      "code": code
-    })
-    .then(response => {
-      return response.data;
-    })
-    .catch(error => {
-      return error;
+export const joinRoom = async (roomId, password, isPrivate) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/join`, {
+      room: roomId,
+      password: password,
+      isPrivate: isPrivate,
     });
-}
+    return response.data;
+  } catch (error) {
+    console.error("Error joining room:", error);
+    return null;
+  }
+};
 
-export const fetchCode = (roomId) => {
-  return axios
-    .get(`http://localhost:3000/code?roomId=${roomId}`)
-    .then(response => {
-      return response.data;
-    })
-    .catch(error => {
-      return error;
+export const createCode = async (roomId, code) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/code`, {
+      room: roomId,
+      code: code,
     });
-}
+    return response.data;
+  } catch (error) {
+    console.error("Error creating code:", error);
+    return null;
+  }
+};
+
+export const fetchCode = async (roomId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/code?roomId=${roomId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching code:", error);
+    return null;
+  }
+};

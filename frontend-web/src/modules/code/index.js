@@ -1,90 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from 'react-native'
-import io from "socket.io-client";
+import React, { useState, useEffect, useRef } from 'react';
+import { StatusBar, View, Text, TextInput, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
+import io from 'socket.io-client';
 import { createCode, fetchCode } from '../../apis';
 
 export default function Code(props) {
-
-  const {roomId} = props;
-  const [code, setCode] = useState();
-  const socket = io('http://localhost:3000');
+  const { roomId } = props;
+  const [code, setCode] = useState('');
+  const socketRef = useRef(null);
+  const windowHeight = Dimensions.get('window').height;
+  const windowWidth = Dimensions.get('window').width;
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
     sendCode(newCode);
-  }
+  };
 
-  const sendCode = (code)=>  {
-    socket.emit('code', code);
-    const res = createCode(roomId, code);
-    console.log("Update Code: ", res);
-  }
+  const sendCode = (code) => {
+    socketRef.current.emit('code', code);
+    createCode(roomId, code)
+      .then((res) => {
+        console.log('Update Code:', res);
+      })
+      .catch((error) => {
+        console.error('Error updating code:', error);
+      });
+  };
 
   const syncCode = async (roomId) => {
-    const res = await fetchCode(roomId);
-    setCode(res.code);
-  }
+    try {
+      const res = await fetchCode(roomId);
+      if (res) {
+        setCode(res);
+      }
+    } catch (error) {
+      console.error('Error fetching code:', error);
+    }
+  };
 
   useEffect(() => {
-    socket.emit('join', roomId);
-  }, []);
+    socketRef.current = io('http://localhost:3000', {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: Infinity,
+    });
+
+    socketRef.current.on('connect', () => {
+      socketRef.current.emit('join', roomId);
+    });
+
+    socketRef.current.on('send-code', (receivedCode) => {
+      setCode(receivedCode);
+    });
+
+    socketRef.current.on('reconnect', () => {
+      console.log('Socket reconnected');
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [roomId]);
 
   useEffect(() => {
-    //Implementing the setInterval method
     const interval = setInterval(() => {
       syncCode(roomId);
     }, 1000);
-    //Clearing the interval
     return () => clearInterval(interval);
   }, [code]);
 
-  useEffect(() => {
-    socket.on('send-code', (code) => {
-      setCode(code);
-    });
-  }, socket);
-
   return (
-    <div>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <Text style={styles.heading}>Room Id: {roomId}</Text>
-        <TextInput multiline={true}
-          onChangeText={(code) => {
-            handleCodeChange(code)
+    <View style={[styles.container,{ height: windowHeight, width: windowWidth }]}>
+      <StatusBar style="auto" />
+      <Text style={styles.heading}>VSCode Editor</Text>
+      <View style={styles.codeContainer}>
+        <TextInput
+          multiline={true}
+          onChangeText={(newCode) => {
+            handleCodeChange(newCode);
           }}
-          defaultValue={code}
-          type="text"
+          value={code}
           autoFocus={true}
-          style={styles.code}
+          style={[styles.code]}
         />
       </View>
-    </div>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#7a42f4',
-    height: '100vh',
-    width: '100vw',
+    backgroundColor: '#333',
     margin: 5,
   },
   heading: {
-    fontSize: '30px',
+    fontSize: 18,
     textAlign: 'center',
-    padding: '10px',
+    padding: 10,
     color: 'white',
+    backgroundColor: '#333',
+  },
+  codeContainer: {
+    flex: 1,
   },
   code: {
-    fontSize: '24px',
-    height: '100vh',
-    width: '100vw',
+    fontSize: 16,
     padding: 10,
-    border: '1px solid #7a42f4',
-    margin: 5,
-    backgroundColor: 'white',
-  }
+    borderColor: '#ddd',
+    borderWidth: 1,
+    backgroundColor: 'black',
+    color: 'white',
+    width: '100%',
+    height: '100%',
+  },
 });

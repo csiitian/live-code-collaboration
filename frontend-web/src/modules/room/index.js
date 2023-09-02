@@ -1,47 +1,49 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
-import Room from './Room'
+import { View, Text, StyleSheet } from 'react-native';
+import Room from './Room';
 
-export default function LoginRoom({handleSetCode}) {
-
-  const roomLoginTypes = Object.freeze({
-    CREATE_ROOM: 'Create Room',
-    JOIN_ROOM: 'Join Room',
-  });
-
-  const[roomLoginType, setRoomLoginType] = useState(roomLoginTypes.CREATE_ROOM);
-  
-  const handleCreateRoom = () => {
-    setRoomLoginType(roomLoginTypes.CREATE_ROOM)
-  }
-
-  const handleJoinRoom = () => {
-    setRoomLoginType(roomLoginTypes.JOIN_ROOM)
-  }
+export default function LoginRoom({ handleSetCode }) {
+  const [roomLoginType, setRoomLoginType] = useState('Create Room');
 
   return (
-    <div>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <View style={styles.rowcontainer}>
-          <Text
-            style={roomLoginType === roomLoginTypes.CREATE_ROOM ? styles.selectedrowtext : styles.rowtext}
-            onPress={handleCreateRoom}>
-              Create Room</Text>
-          <Text
-            style={roomLoginType === roomLoginTypes.JOIN_ROOM ? styles.selectedrowtext : styles.rowtext}
-            onPress={handleJoinRoom}>
-              Join Room</Text>
-        </View>
-
-        {
-          roomLoginType === roomLoginTypes.CREATE_ROOM 
-            ? <Room isCreate={true} handleSetCode={handleSetCode} /> 
-            : <Room isJoin={true} handleSetCode={handleSetCode} />
-        }
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <View style={styles.rowContainer}>
+        <Text
+          style={[
+            styles.rowText,
+            roomLoginType === 'Create Room' && styles.selectedRowText,
+          ]}
+          onPress={() => setRoomLoginType('Create Room')}>
+          Create Room
+        </Text>
+        <Text
+          style={[
+            styles.rowText,
+            roomLoginType === 'Join Room' && styles.selectedRowText,
+          ]}
+          onPress={() => setRoomLoginType('Join Room')}>
+          Join Room
+        </Text>
       </View>
-    </div>
+
+      <View style={styles.roomContainer}>
+        {roomLoginType === 'Create Room' ? (
+          <Room isCreate={true} handleSetCode={handleSetCode} />
+        ) : (
+          <Room isJoin={true} handleSetCode={handleSetCode} />
+        )}
+      </View>
+
+      {/* Additional Text and Design Elements */}
+      <Text style={styles.infoText}>
+        Welcome to Live Code Collaboration!
+      </Text>
+      <Text style={styles.infoText}>
+        Collaborate with your team in real-time using this platform.
+      </Text>
+    </View>
   );
 }
 
@@ -51,36 +53,54 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '1px solid #7a42f4',
-    padding: '20px',
+    borderColor: '#7a42f4',
+    borderWidth: 1,
+    padding: 20,
   },
-  rowcontainer: {
-    flex: 1,
-    flexDirection: "row",
-    padding: '10px',
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    marginBottom: 20,
   },
-  selectedrowtext: {
-    padding: '10px',
+  selectedRowText: {
+    paddingHorizontal: 10,
     backgroundColor: '#7a42f4',
     color: 'white',
+    fontWeight: 'bold',
   },
-  rowtext: {
-    padding: '10px',
+  rowText: {
+    paddingHorizontal: 10,
+    fontWeight: 'bold',
+  },
+  roomContainer: {
+    width: '100%',
   },
   input: {
     padding: 10,
-    margin: 15,
+    marginVertical: 15,
     height: 40,
     borderColor: '#7a42f4',
-    borderWidth: 1
+    borderWidth: 1,
+    width: '100%',
   },
   submitButton: {
     backgroundColor: '#7a42f4',
     padding: 10,
-    margin: 15,
+    marginVertical: 15,
     height: 40,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
   },
-  submitButtonText:{
-    color: 'white'
-  }
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  infoText: {
+    marginVertical: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

@@ -1,31 +1,21 @@
-import { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import LoginRoom from './src/modules/room';
 import Code from './src/modules/code';
 
 export default function App() {
 
-  // TODO: Save Session to handle reload
-
-  const [roomId, setRoomId] = useState()
-  const [code, setCode] = useState(false)
-
-  const handleSetCode = (roomId) => {
-    setRoomId(roomId);
-    setCode(true);
-  };
-
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      { code
-        ? <Code roomId={roomId} /> 
-        : <>
+      {code ? (
+        <Code roomId={roomId} />
+      ) : (
+        <>
           <Text style={styles.text}>Live Code Collaboration</Text>
-          <LoginRoom handleSetCode={handleSetCode}  />
+          <LoginRoom handleSetCode={handleSetCode} />
         </>
-      }
+      )}
     </View>
   );
 }
@@ -38,13 +28,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: '5vw',
+    fontSize: 24, // Use an appropriate numeric value
     fontFamily: 'Verdana',
-    padding: '10px',
-    margin: '10px',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 10, // Use numeric values for padding and margin
+    margin: 10,
     color: 'white',
-    borderRadius: '10px',
+    borderRadius: 10,
   },
 });
