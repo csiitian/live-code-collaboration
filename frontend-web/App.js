@@ -2,8 +2,16 @@ import React, { useState } from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import LoginRoom from './src/modules/room';
 import Code from './src/modules/code';
-
+  
 export default function App() {
+
+  const [roomId, setRoomId] = useState(null);
+  const [code, setCode] = useState(false);
+
+  const handleSetCode = (roomId) => { 
+    setRoomId(roomId);
+    setCode(true);
+  };
 
   return (
     <View style={styles.container}>

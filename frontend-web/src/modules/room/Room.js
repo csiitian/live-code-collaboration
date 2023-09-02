@@ -114,6 +114,10 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     alignSelf: 'center',
+    borderColor: 'blue',
+    tintColor: 'blue',
+    shadowColor: 'blue',
+    backgroundColor: 'blue',
   },
   label: {
     paddingStart: 10,
