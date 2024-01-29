@@ -1,32 +1,40 @@
 import axios from "axios";
+import RoomResponse from "../apis/response/RoomResponse";
+import { validateRoom } from "./helpers.js";
 
 const API_BASE_URL = "http://localhost:3000";
 
 export const createRoom = async (roomId, password, isPrivate) => {
+  if (!validateRoom(roomId, password, isPrivate)) {
+    return new RoomResponse(null, "RoomId or Password can't be empty");
+  }
   try {
     const response = await axios.post(`${API_BASE_URL}/create`, {
       room: roomId,
       password: password,
       isPrivate: isPrivate,
     });
-    return response.data;
+    return new RoomResponse(response.data, null);
   } catch (error) {
     console.error("Error creating room:", error);
-    return null;
+    return new RoomResponse(null, error.response.data);
   }
 };
 
 export const joinRoom = async (roomId, password, isPrivate) => {
+  if (!validateRoom(roomId, password, isPrivate)) {
+    return new RoomResponse(null, "RoomId or Password can't be empty");
+  }
   try {
     const response = await axios.post(`${API_BASE_URL}/join`, {
       room: roomId,
       password: password,
       isPrivate: isPrivate,
     });
-    return response.data;
+    return new RoomResponse(response.data, null);
   } catch (error) {
     console.error("Error joining room:", error);
-    return null;
+    return new RoomResponse(null, error.response.data);
   }
 };
 
